@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 from dotenv import load_dotenv
 import os
 
@@ -28,7 +28,7 @@ def games():
 @app.route('/new')
 def new_game():
     if 'logged_user' not in session:
-        return redirect('/login')
+        return redirect(url_for('login', next_page=url_for('new_game')))
     return render_template('new_game.html', title='New Game')
 
 
@@ -41,12 +41,13 @@ def create_game():
     game = Game(name, category, console)
     games_list.append(game)
 
-    return redirect('/')
+    return redirect(url_for('games'))
 
 
 @app.route('/login')
 def login():
-    return render_template('login.html', title='Login')
+    next_page = request.args.get('next_page')
+    return render_template('login.html', title='Login', next_page=next_page)
 
 
 @app.route('/autenticate', methods=['POST'])
@@ -54,17 +55,19 @@ def autenticate():
     if 'alohomora' == request.form['password']:
         session['logged_user'] = request.form['user']
         flash(f'{session['logged_user']} logado com sucesso')
-        return redirect('/')
+        next_page = request.form['next_page']
+        print('11111111' + next_page)
+        return redirect(next_page)
     else:
         flash(f'Usuário não encontrado')
-        return redirect('/login')
+        return redirect(url_for('login'))
 
 
 @app.route('/logout')
 def logout():
     session.pop('logged_user', None)
     flash(f'Logout efetuado com sucesso')
-    return redirect('/')
+    return redirect(url_for('games'))
 
 
 app.run(debug=True)
