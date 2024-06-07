@@ -2,35 +2,15 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, session, flash, url_for
-from flask_sqlalchemy import SQLAlchemy
+from models import db, Game, Appuser
 
 load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
-
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 
-db = SQLAlchemy(app)
-
-
-class Game(db.Model):
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
-    category = db.Column(db.String(40), nullable=False)
-    console = db.Column(db.String(20), nullable=False)
-
-    def __repr__(self):
-        return '<Game %r>' % self.name
-
-
-class Appuser(db.Model):
-    username = db.Column(db.String(8), primary_key=True, autoincrement=True)
-    name = db.Column(db.String(20), nullable=False)
-    password = db.Column(db.String(10), nullable=False)
-
-    def __repr__(self):
-        return '<Game %r>' % self.name
+db.init_app(app)
 
 
 @app.route('/')
@@ -78,7 +58,7 @@ def authenticate():
     if user:
         password = request.form['password']
         if user.password == password:
-            session['logged_user'] = user.nickname
+            session['logged_user'] = user.username
             flash(f'{user.name} logado com sucesso')
             return redirect(next_page)
     flash(f'Usuário não encontrado')
