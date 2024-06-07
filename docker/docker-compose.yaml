@@ -1,0 +1,21 @@
+version: "3.1"
+services:
+  db:
+    build: 
+      dockerfile: ./postgres.dockerfile
+      context: ./
+    image: flask-db
+    container_name: db-container
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: flask
+      POSTGRES_USER: flask-user
+      POSTGRES_DB: flask-db
+    ports:
+      - "5435:5432"
+    networks:
+      - flask-network
+
+networks:
+  flask-network:
+    driver: bridge
