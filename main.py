@@ -6,35 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
-
-class Game():
-    def __init__(self, name, category, console):
-        self.name = name
-        self.category = category
-        self.console = console
-
-
-class User():
-    def __init__(self, name, user, password):
-        self.name = name
-        self.user = user
-        self.password = password
-
-
-game1 = Game(name='Resident Evil', category='Action', console='PS4')
-game2 = Game(name='Metroid', category='RPG', console='Switch')
-games_list = [game1, game2]
-
-user1 = User(name='Josiel', user='josiel', password='1234')
-user2 = User(name='Jussara', user='jussara', password='5678')
-user3 = User(name='Pedro', user='pedro', password='91011')
-
-users = {
-    user1.user: user1,
-    user2.user: user2,
-    user3.user: user3
-}
-
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
 
@@ -43,8 +14,28 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 db = SQLAlchemy(app)
 
 
+class Game(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(50), nullable=False)
+    category = db.Column(db.String(40), nullable=False)
+    console = db.Column(db.String(20), nullable=False)
+
+    def __repr__(self):
+        return '<Game %r>' % self.name
+
+
+class Appuser(db.Model):
+    username = db.Column(db.String(8), primary_key=True, autoincrement=True)
+    name = db.Column(db.String(20), nullable=False)
+    password = db.Column(db.String(10), nullable=False)
+
+    def __repr__(self):
+        return '<Game %r>' % self.name
+
+
 @app.route('/')
-def games():
+def index():
+    games_list = Game.query.order_by(Game.name)
     return render_template('gamelist.html', title='Games', games=games_list)
 
 
@@ -61,10 +52,16 @@ def create_game():
     category = request.form['category']
     console = request.form['console']
 
-    game = Game(name, category, console)
-    games_list.append(game)
+    game = Game.query.filter_by(name=name).first()
+    if game:
+        flash('Game já existe')
+        return redirect(url_for('index'))
 
-    return redirect(url_for('games'))
+    game = Game(name=name, category=category, console=console)
+    db.session.add(game)
+    db.session.commit()
+
+    return redirect(url_for('index'))
 
 
 @app.route('/login')
@@ -75,16 +72,15 @@ def login():
 
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
-    next_page = request.form['next_page'] if request.form['next_page'] is None else '/'
     form_user = request.form['user']
-    if form_user in users:
-        user = users[form_user]
+    next_page = request.form['next_page'] if request.form['next_page'] is not None else '/'
+    user = Appuser.query.filter_by(username=form_user).first()
+    if user:
         password = request.form['password']
         if user.password == password:
-            session['logged_user'] = form_user
-            flash(f'{session['logged_user']} logado com sucesso')
+            session['logged_user'] = user.nickname
+            flash(f'{user.name} logado com sucesso')
             return redirect(next_page)
-
     flash(f'Usuário não encontrado')
     return redirect(url_for('login', next_page=next_page))
 
@@ -93,7 +89,7 @@ def authenticate():
 def logout():
     session.pop('logged_user', None)
     flash(f'Logout efetuado com sucesso')
-    return redirect(url_for('games'))
+    return redirect(url_for('index'))
 
 
 app.run(debug=True)
