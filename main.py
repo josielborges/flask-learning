@@ -2,6 +2,7 @@ import os
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, session, flash, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
@@ -36,6 +37,10 @@ users = {
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+
+db = SQLAlchemy(app)
 
 
 @app.route('/')
