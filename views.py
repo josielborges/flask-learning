@@ -1,5 +1,6 @@
-from flask import render_template, request, redirect, session, flash, url_for
+from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 
+import helpers
 from main import app, db
 from models import Game, Appuser
 
@@ -22,7 +23,9 @@ def edit_game(id):
     if 'logged_user' not in session:
         return redirect(url_for('login', next_page=url_for('edit_game')))
     game = Game.query.filter_by(id=id).first()
-    return render_template('edit_game.html', title='Edit Game', game=game)
+    thumb = helpers.get_image(id)
+    return render_template('edit_game.html', title='Edit Game', game=game, thumb=thumb)
+
 
 @app.route('/remove/<int:id>')
 def remove_game(id):
@@ -33,6 +36,7 @@ def remove_game(id):
     flash('Game removed')
     return redirect(url_for('index'))
 
+
 @app.route('/update', methods=['POST'])
 def update_game():
     game = Game.query.filter_by(id=request.form['id']).first()
@@ -42,6 +46,10 @@ def update_game():
 
     db.session.add(game)
     db.session.commit()
+
+    file = request.files['file']
+    upload_path = app.config['UPLOAD_PATH']
+    file.save(f'{upload_path}/thumb-{game.id}.{file.filename.rsplit(".", 1)[1]}')
 
     return redirect(url_for('index'))
 
@@ -60,6 +68,10 @@ def create_game():
     game = Game(name=name, category=category, console=console)
     db.session.add(game)
     db.session.commit()
+
+    file = request.files['file']
+    upload_path = app.config['UPLOAD_PATH']
+    file.save(f'{upload_path}/thumb-{game.id}.{file.filename.rsplit(".", 1)[1]}')
 
     return redirect(url_for('index'))
 
@@ -90,3 +102,8 @@ def logout():
     session.pop('logged_user', None)
     flash(f'Logout efetuado com sucesso')
     return redirect(url_for('index'))
+
+
+@app.route('/uploads/<filename>')
+def image(filename):
+    return send_from_directory(app.config['UPLOAD_PATH'], filename)

@@ -1,6 +1,17 @@
 {% extends "template.html" %}
 {% block content %}
-    <form method="post" action="{{ url_for('create_game') }}">
+    <form method="post" action="{{ url_for('create_game') }}" enctype="multipart/form-data">
+
+        <figure class="img-thumbnail col-md-4">
+            <img class="img-fluid" src="{{ url_for('image', filename='default_thumb.jpg') }}" alt="Change thumbnail">
+            <figcaption>
+                <label class="fileContainer">
+                    Change thumbnail
+                    <input type="file" name="file" accept=".jpg,.png">
+                </label>
+            </figcaption>
+        </figure>
+
         <fieldset>
             <div class="form-group">
                 <label for="nome">Nome</label>
