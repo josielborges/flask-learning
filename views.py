@@ -10,7 +10,7 @@ from models import Game, Appuser
 @app.route('/')
 def index():
     games_list = Game.query.order_by(Game.name)
-    return render_template('gamelist.html', title='Games', games=games_list)
+    return render_template('gamelist.html', title='Games', games=games_list, session=session)
 
 
 @app.route('/new')
@@ -90,7 +90,7 @@ def login():
 @app.route('/authenticate', methods=['POST'])
 def authenticate():
     form_user = request.form['user']
-    next_page = request.form['next_page'] if request.form['next_page'] is not None else '/'
+    next_page = request.form['next_page'] if request.form['next_page'] != 'None' else '/'
     user = Appuser.query.filter_by(username=form_user).first()
     if user:
         password = request.form['password']
