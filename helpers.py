@@ -5,9 +5,12 @@ from main import app
 
 def get_image(id):
     for filename in os.listdir(app.config['UPLOAD_PATH']):
-        if filename == 'default_thumb.jpg':
-            continue
-        file_id = filename.rsplit('-')[1].rsplit('.')[0]
-        if int(id) == int(file_id):
+        if f'thumb-{id}-' in filename:
             return filename
     return 'default_thumb.jpg'
+
+
+def remove_image(id):
+    file = get_image(id)
+    if file != 'default_thumb.jpg':
+        os.remove(os.path.join(app.config['UPLOAD_PATH'], file))

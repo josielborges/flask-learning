@@ -1,6 +1,8 @@
+import time
+
 from flask import render_template, request, redirect, session, flash, url_for, send_from_directory
 
-import helpers
+from helpers import get_image, remove_image
 from main import app, db
 from models import Game, Appuser
 
@@ -23,7 +25,7 @@ def edit_game(id):
     if 'logged_user' not in session:
         return redirect(url_for('login', next_page=url_for('edit_game')))
     game = Game.query.filter_by(id=id).first()
-    thumb = helpers.get_image(id)
+    thumb = get_image(id)
     return render_template('edit_game.html', title='Edit Game', game=game, thumb=thumb)
 
 
@@ -49,7 +51,9 @@ def update_game():
 
     file = request.files['file']
     upload_path = app.config['UPLOAD_PATH']
-    file.save(f'{upload_path}/thumb-{game.id}.{file.filename.rsplit(".", 1)[1]}')
+    timestamp = time.time()
+    remove_image(game.id)
+    file.save(f'{upload_path}/thumb-{game.id}-{timestamp}.{file.filename.rsplit(".", 1)[1]}')
 
     return redirect(url_for('index'))
 
@@ -71,7 +75,8 @@ def create_game():
 
     file = request.files['file']
     upload_path = app.config['UPLOAD_PATH']
-    file.save(f'{upload_path}/thumb-{game.id}.{file.filename.rsplit(".", 1)[1]}')
+    timestamp = time.time()
+    file.save(f'{upload_path}/thumb-{game.id}-{timestamp}.{file.filename.rsplit(".", 1)[1]}')
 
     return redirect(url_for('index'))
 
