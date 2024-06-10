@@ -24,6 +24,14 @@ def edit_game(id):
     game = Game.query.filter_by(id=id).first()
     return render_template('edit_game.html', title='Edit Game', game=game)
 
+@app.route('/remove/<int:id>')
+def remove_game(id):
+    if 'logged_user' not in session:
+        return redirect(url_for('login'))
+    Game.query.filter_by(id=id).delete()
+    db.session.commit()
+    flash('Game removed')
+    return redirect(url_for('index'))
 
 @app.route('/update', methods=['POST'])
 def update_game():
