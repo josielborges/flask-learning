@@ -18,7 +18,7 @@ VALUES ('Josiel', 'josiel', '1234');
 INSERT INTO appuser (name, username, password)
 VALUES ('Jussara', 'jussara', '5678');
 INSERT INTO appuser (name, username, password)
-VALUES ('Pedro', 'Pedro', '4321');
+VALUES ('Pedro', 'pedro', '4321');
 
 INSERT INTO game (name, category, console)
 VALUES ('Tetris', 'Puzzle', 'Atari');

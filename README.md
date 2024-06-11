@@ -27,3 +27,7 @@ jdbc:postgresql://localhost:5435/flask-db
 Docker is required to run the db dockerfile.
 
 See more at https://docs.docker.com/get-docker/
+
+#### Update passwords
+
+At first execution, use the path http://127.0.0.1:5000/update_default_users_passwords to update the passwords with encryption.
