@@ -3,8 +3,6 @@ import os
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, PasswordField, validators
 
-from main import app
-
 
 class GameForm(FlaskForm):
     name = StringField('Game name', validators=[validators.DataRequired(), validators.length(min=1, max=50)])
@@ -17,6 +15,9 @@ class UserForm(FlaskForm):
     user = StringField('User', validators=[validators.DataRequired(), validators.length(min=1, max=8)])
     password = PasswordField('Password', validators=[validators.DataRequired(), validators.length(min=1, max=100)])
     submit = SubmitField('Submit')
+
+
+from main import app
 
 
 def get_image(id):
