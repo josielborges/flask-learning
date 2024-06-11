@@ -1,7 +1,7 @@
 {% extends "template.html" %}
 {% block content %}
     <form method="post" action="{{ url_for('create_game') }}" enctype="multipart/form-data">
-        {{ game_form.csrf_token }}
+        {{ form.csrf_token }}
 
         <figure class="img-thumbnail col-md-4">
             <img class="img-fluid" src="{{ url_for('image', filename='default_thumb.jpg') }}" alt="Change thumbnail">
@@ -15,19 +15,19 @@
 
         <fieldset>
             <div class="form-group">
-                {{ game_form.name.label(class="form-label") }}
-                {{ game_form.name(class="form-control") }}
+                {{ form.name.label(class="form-label") }}
+                {{ form.name(class="form-control") }}
             </div>
             <div class="form-group">
-                {{ game_form.category.label(class="form-label") }}
-                {{ game_form.category(class="form-control") }}
+                {{ form.category.label(class="form-label") }}
+                {{ form.category(class="form-control") }}
             </div>
             <div class="form-group">
-                {{ game_form.console.label(class="form-label") }}
-                {{ game_form.console(class="form-control") }}
+                {{ form.console.label(class="form-label") }}
+                {{ form.console(class="form-control") }}
             </div>
             <div>
-                {{ game_form.submit(class="btn btn-primary") }}
+                {{ form.submit(class="btn btn-primary") }}
                 <a class="btn btn-danger" href="{{ url_for('index') }}">Back</a>
             </div>
         </fieldset>
